@@ -1,0 +1,4 @@
+Arduino Uno
+HC-SR04 ultrasonic sensor 
+L298N motor driver
+RS-775 series high-torque DC motor

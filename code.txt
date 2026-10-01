@@ -1,0 +1,70 @@
+// Ultrasonic sensor
+const int TRIG_PIN = 7;
+const int ECHO_PIN = 6;
+
+// L298N
+const int ENA_PIN = 9; 
+
+// PWM
+const int IN1_PIN = 8;
+const int IN2_PIN = 10;
+
+// Detection distance
+const int HAND_DISTANCE = 15;  // cm
+
+// Motor speed: 0-255
+const int MOTOR_SPEED = 200;
+
+void setup() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+
+  pinMode(ENA_PIN, OUTPUT);
+  pinMode(IN1_PIN, OUTPUT);
+  pinMode(IN2_PIN, OUTPUT);
+
+  Serial.begin(9600);
+
+  // Motor direction
+  digitalWrite(IN1_PIN, HIGH);
+  digitalWrite(IN2_PIN, LOW);
+
+  // Start motor
+  analogWrite(ENA_PIN, MOTOR_SPEED);
+}
+
+void loop() {
+
+  // Send ultrasonic pulse
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(TRIG_PIN, LOW);
+
+  // Measure echo
+  long duration = pulseIn(ECHO_PIN, HIGH, 30000);
+
+  // Convert to distance in cm
+  float distance = duration * 0.0343 / 2;
+
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Check hand position
+  if (distance > 0 && distance <= HAND_DISTANCE) {
+
+    // HAND DETECTED → STOP
+    analogWrite(ENA_PIN, 0);
+
+  } else {
+
+    // HAND REMOVED → RUN
+    analogWrite(ENA_PIN, MOTOR_SPEED);
+  }
+
+  delay(50);
+}
